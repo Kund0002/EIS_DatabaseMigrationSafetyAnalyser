@@ -2,9 +2,11 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
     hooks:
-      - name: Ruff (check only)
+      - id: ruff
+        name: Ruff (check only)
         run: ruff check .
-      - name: Ruff format (check only)
+      - id: ruff-format
+        name: Ruff format (check only)
         run: ruff format --check .
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
