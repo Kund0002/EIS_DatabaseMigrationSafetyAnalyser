@@ -1,0 +1,26 @@
+[project]
+name = "migration-analyser"
+version = "0.0.0"
+description = "Static analyser for PostgreSQL migration scripts."
+requires-python = ">=3.10"
+
+dependencies = [
+  "sqlglot>=25.0.0"
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q"
+testpaths = ["tests"]
