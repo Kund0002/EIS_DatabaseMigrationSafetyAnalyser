@@ -11,4 +11,4 @@ for _i, stmt in enumerate(sql, start=1):
     print("\nStatement")
     print(stmt)
     print("\nAST")
-    print(stmt.dump())
+    print(repr(stmt))
