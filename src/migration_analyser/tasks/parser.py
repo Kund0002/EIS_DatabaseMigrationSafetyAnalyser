@@ -22,4 +22,4 @@ def parse_sql():
         print(stmt)
         print("\nAST")
         print(repr(stmt))
-    return stmt
+    return repr(stmt)
