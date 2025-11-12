@@ -207,6 +207,62 @@ def validate_sql_safety(sql_query, raise_on_danger=False, dialect=None):
     return True
 
 
+class WhereClauseResult:
+    """Result object for WHERE clause detection task"""
+
+    def __init__(self, statement_num, results):
+        self.statement_num = statement_num
+        self.results = results
+        self.is_safe = all(not r["is_dangerous"] for r in results)
+        self.dangerous_count = sum(1 for r in results if r["is_dangerous"])
+        self.statement_type = results[0]["statement_type"] if results else "UNKNOWN"
+
+    def __str__(self):
+        if self.is_safe:
+            return (
+                f"WhereClauseResult(statement={self.statement_num}, "
+                f"type={self.statement_type}, status='SAFE')"
+            )
+        else:
+            return (
+                f"WhereClauseResult(statement={self.statement_num}, "
+                f"type={self.statement_type}, status='DANGEROUS', "
+                f"issues={self.dangerous_count})"
+            )
+
+
+def run_task(parsed_stmt, statement_num=1):
+    """
+    Run WHERE clause safety check on a single parsed SQL statement.
+
+    Args:
+        parsed_stmt: A sqlglot expression node (parsed SQL statement)
+        statement_num: The statement number (for display purposes)
+
+    Returns:
+        WhereClauseResult: Object containing analysis results
+    """
+    # Check the parsed statement for dangerous commands
+    results = check_ast_for_dangerous_commands(parsed_stmt)
+
+    # If no dangerous commands found in the statement itself, check if it's safe
+    if not results:
+        statement_type = get_statement_type(parsed_stmt)
+        results = [
+            {
+                "is_dangerous": False,
+                "statement_type": statement_type,
+                "has_where": None,
+                "message": f"{statement_type} statement is safe",
+                "node": parsed_stmt,
+            }
+        ]
+
+    print(parsed_stmt)
+
+    return WhereClauseResult(statement_num, results)
+
+
 # Example usage
 if __name__ == "__main__":
     test_queries = [

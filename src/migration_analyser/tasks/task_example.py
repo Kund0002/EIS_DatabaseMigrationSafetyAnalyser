@@ -8,7 +8,6 @@ class StatementDetector:
 
 def run_task(parsed_stmt):
     # do the fuckass detection here
-    print("heres the stmn")
     print(parsed_stmt)
-    result = StatementDetector("script is fine")
+    result = StatementDetector("yes this is a script")
     return result
