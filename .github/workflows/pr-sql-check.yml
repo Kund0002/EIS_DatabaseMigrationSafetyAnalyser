@@ -1,0 +1,55 @@
+name: SQL Migration Safety Check
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.sql'
+      - 'src/migration_analyser/**'
+      - '.github/workflows/pr-sql-check.yml'
+
+jobs:
+  sql-safety-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Find SQL files in PR
+        id: find-sql
+        run: |
+          # Get all SQL files changed in this PR
+          SQL_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.sql$' || true)
+
+          if [ -z "$SQL_FILES" ]; then
+            echo "No SQL files found in this PR"
+            echo "has_sql=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found SQL files:"
+            echo "$SQL_FILES"
+            echo "has_sql=true" >> $GITHUB_OUTPUT
+            # Convert newlines to spaces for passing to the analyser
+            echo "sql_files=$(echo $SQL_FILES | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run SQL Migration Safety Analyser
+        if: steps.find-sql.outputs.has_sql == 'true'
+        run: |
+          echo "🔍 Analysing SQL files for safety issues..."
+          python -m migration_analyser.cli ${{ steps.find-sql.outputs.sql_files }}
+
+      - name: Check passed
+        if: steps.find-sql.outputs.has_sql == 'false'
+        run: |
+          echo "✅ No SQL files to check in this PR"

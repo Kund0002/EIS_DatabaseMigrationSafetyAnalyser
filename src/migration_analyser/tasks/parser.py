@@ -17,9 +17,11 @@ def parse_sql():
 
     sql = sqlglot.parse(sql_text)
 
-    for _i, stmt in enumerate(sql, start=1):
-        print("\nStatement")
+    """ print(f"\nParsed {len(sql)} statement(s) from {sql_file}")
+    for i, stmt in enumerate(sql, start=1):
+        print(f"\n--- Statement {i} ---")
         print(stmt)
-        print("\nAST")
-        print(repr(stmt))
-    return stmt
+        print("\n--- AST ---")
+        print(repr(stmt)) """
+
+    return sql  # Return all statements, not just the last one

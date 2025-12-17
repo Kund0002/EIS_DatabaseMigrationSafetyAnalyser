@@ -8,6 +8,10 @@ dependencies = [
   "sqlglot>=25.0.0"
 ]
 
+[project.scripts]
+migration-analyser = "migration_analyser.cli:main"
+
+
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
