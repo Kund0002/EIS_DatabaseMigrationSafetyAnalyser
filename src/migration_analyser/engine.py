@@ -1,13 +1,29 @@
-from tasks import context_where, parser, task_example
+from pathlib import Path
+
+import sqlglot
+
+from migration_analyser.tasks import context_where, task_example
 
 
-def main():
+def analyse_file(sql_file_path):
+    """
+    Analyse a SQL file for safety issues.
+
+    Args:
+        sql_file_path: Path to the SQL file to analyse
+
+    Returns:
+        tuple: (number of dangerous statements, total number of statements)
+    """
+    sql_file = Path(sql_file_path)
+    sql_text = sql_file.read_text()
+
     # Parse all SQL statements
-    parsed_statements = parser.parse_sql()
+    parsed_statements = sqlglot.parse(sql_text)
 
     if not parsed_statements:
         print("\nNo statements found to analyse.")
-        return
+        return 0, 0
 
     print("\n" + "=" * 70)
     print("Running Safety Checks")
@@ -58,6 +74,13 @@ def main():
         print("\n✓ All statements are SAFE to execute")
 
     print("=" * 70)
+
+    return len(dangerous_statements), len(parsed_statements)
+
+
+def main():
+    """Run the analyser on the default example SQL file."""
+    analyse_file("examplesql.sql")
 
 
 if __name__ == "__main__":
